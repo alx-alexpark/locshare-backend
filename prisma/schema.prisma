@@ -1,0 +1,47 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  keyid String @id @unique
+  publicKey String
+  fullName  String
+  email String
+  emailVerified DateTime?
+  token String?
+  tokenExpiry DateTime?
+  createdAt DateTime @default(now())
+  groups Group[] @relation("GroupMembers")
+  LocationUpdate LocationUpdate[] @relation("LocationUpdate to User")
+}
+
+model Group {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name String
+  members User[] @relation("GroupMembers")
+  locationupdates LocationUpdate[]
+}
+
+model LocationUpdate {
+  id Int @id @default(autoincrement())
+  user User @relation("LocationUpdate to User", fields: [userId], references: [keyid])
+  userId String
+  cipherText String
+  timestamp DateTime @default(now())
+  expiresAt DateTime
+  Group Group[]
+}
+
