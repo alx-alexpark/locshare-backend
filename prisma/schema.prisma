@@ -19,8 +19,6 @@ model User {
   fullName  String
   email String
   emailVerified DateTime?
-  token String?
-  tokenExpiry DateTime?
   createdAt DateTime @default(now())
   groups Group[] @relation("GroupMembers")
   LocationUpdate LocationUpdate[] @relation("LocationUpdate to User")
@@ -36,10 +34,14 @@ model Attestation {
   userId String
   challenge String
   type AttestationType
+  authToken String?
+  verified Boolean @default(false)
+  fullfilled Boolean @default(false)
 }
 
 enum AttestationType {
-  TOKENREQUEST
+  SESSION
+  SIGNUP
 }
 
 model Group {
