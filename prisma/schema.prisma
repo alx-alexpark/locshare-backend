@@ -24,6 +24,22 @@ model User {
   createdAt DateTime @default(now())
   groups Group[] @relation("GroupMembers")
   LocationUpdate LocationUpdate[] @relation("LocationUpdate to User")
+  Attestation Attestation[]
+}
+
+model Attestation {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  expiresAt DateTime @default(now())
+  user User @relation(fields: [userId], references: [keyid])
+  userId String
+  challenge String
+  type AttestationType
+}
+
+enum AttestationType {
+  TOKENREQUEST
 }
 
 model Group {
