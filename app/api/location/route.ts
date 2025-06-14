@@ -21,14 +21,18 @@ export async function POST(request: Request) {
 
         // Get the request body
         const data = await request.json();
-        const { cipherText, groupIds, expiresAt } = data;
+        const { cipherText, groupIds } = data;
 
-        if (!cipherText || !groupIds || !expiresAt) {
+        if (!cipherText || !groupIds || !Array.isArray(groupIds)) {
             return NextResponse.json(
                 { error: 'Missing required fields' },
                 { status: 400 }
             );
         }
+
+        // Set expiration to 24 hours from now
+        const now = new Date();
+        const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24 hours
 
         // Verify user is a member of all specified groups
         const userGroups = await prisma.group.findMany({
@@ -62,7 +66,7 @@ export async function POST(request: Request) {
             data: {
                 userId: userKeyId,
                 cipherText,
-                expiresAt: new Date(expiresAt),
+                expiresAt,
                 Group: {
                     connect: groupIds.map((id: number) => ({ id }))
                 }
