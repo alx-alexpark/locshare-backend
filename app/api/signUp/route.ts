@@ -23,6 +23,6 @@ export async function POST(request: Request) {
             },
         }
     )
-    return Response.json({ keyId: keyId });
+    return Response.json({ sucess: true, keyId: keyId });
 
 }
