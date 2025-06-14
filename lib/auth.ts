@@ -1,3 +1,4 @@
+import { hashToken } from './hash';
 import prisma from './prisma';
 import * as openpgp from 'openpgp';
 
@@ -6,7 +7,7 @@ export async function getAuth(token: string): Promise<openpgp.Key | null> {
         // Find attestation by token
         const attestation = await prisma.attestation.findFirst({
             where: {
-                authToken: token,
+                authToken: hashToken(token),
                 verified: true,
                 fullfilled: true,
                 expiresAt: {
@@ -17,6 +18,8 @@ export async function getAuth(token: string): Promise<openpgp.Key | null> {
                 user: true
             }
         });
+        
+        console.log(attestation);
 
         if (!attestation?.user?.publicKey) {
             return null;

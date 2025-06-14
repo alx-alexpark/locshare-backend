@@ -1,12 +1,15 @@
 import prisma from '@/lib/prisma';
 import { AttestationType } from '@prisma/client';
 import * as openpgp from 'openpgp';
+import { hashToken } from '@/lib/hash';
 
 const genRanHex = (size: number) => [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
 
 export async function POST(request: Request) {
     const data = await request.json();
     const { signedChallenge } = data;
+
+    console.log(signedChallenge);
 
     const message = await openpgp.readCleartextMessage({ cleartextMessage: signedChallenge });
 
@@ -32,6 +35,9 @@ export async function POST(request: Request) {
     });
 
     const token = genRanHex(128);
+    const hashedToken = hashToken(token);
+    const now = new Date();
+    const tokenExpiry = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24 hours
 
     if (verified.signatures[0].keyID.toHex().toUpperCase() === user.keyid) {
         await prisma.attestation.update({
@@ -40,8 +46,9 @@ export async function POST(request: Request) {
             },
             data: {
                 verified: true,
-                authToken: token,
-                fullfilled: true
+                authToken: hashedToken,
+                fullfilled: true,
+                expiresAt: tokenExpiry // Update expiry to 24 hours for the token
             },
         });
     }

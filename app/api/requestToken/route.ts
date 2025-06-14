@@ -19,11 +19,13 @@ export async function POST(request: Request) {
     }
 
     const challengeString = genRanHex(128);
+    const now = new Date();
+    const attestationExpiry = new Date(now.getTime() + 15 * 60 * 1000); // 15 minutes
 
     const attestation = await prisma.attestation.create({
         data: {
             user: { connect: { keyid: user.keyid } },
-            // TODO: expiry time
+            expiresAt: attestationExpiry,
             type: AttestationType.SESSION,
             challenge: challengeString
         },
