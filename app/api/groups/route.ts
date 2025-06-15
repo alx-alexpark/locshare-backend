@@ -10,8 +10,6 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        console.log("\"" + authHeader + "\"");
-
         // Get the token and verify it
         const token = authHeader.split(' ')[1];
         const key = await getAuth(token);

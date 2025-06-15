@@ -9,8 +9,6 @@ export async function POST(request: Request) {
     const data = await request.json();
     const { signedChallenge } = data;
 
-    console.log(signedChallenge);
-
     const message = await openpgp.readCleartextMessage({ cleartextMessage: signedChallenge });
 
     const attestation = await prisma.attestation.findFirst({

@@ -23,6 +23,8 @@ export async function POST(request: Request) {
         const data = await request.json();
         const { cipherText, groupIds } = data;
 
+        console.log(data);
+
         if (!cipherText || !groupIds || !Array.isArray(groupIds)) {
             return NextResponse.json(
                 { error: 'Missing required fields' },
@@ -61,10 +63,23 @@ export async function POST(request: Request) {
             );
         }
 
+        // Clean up expired records
+        await prisma.locationUpdate.deleteMany({
+            where: {
+                expiresAt: {
+                    lt: now
+                }
+            }
+        });
+
         // Create the location update
         const locationUpdate = await prisma.locationUpdate.create({
             data: {
-                userId: userKeyId,
+                user: {
+                    connect: {
+                        keyid: userKeyId
+                    }
+                },
                 cipherText,
                 expiresAt,
                 Group: {
@@ -182,10 +197,9 @@ export async function GET(request: Request) {
                     }
                 }
             },
-            orderBy: [
-                { userId: 'asc' },
-                { timestamp: 'desc' }
-            ]
+            orderBy: {
+                timestamp: 'desc'
+            }
         });
 
         // Group updates by user and limit per user
@@ -200,8 +214,10 @@ export async function GET(request: Request) {
             return acc;
         }, {} as Record<string, typeof updates>);
 
-        // Flatten the updates back into an array
-        const limitedUpdates = Object.values(updatesByUser).flat();
+        // Flatten the updates back into an array and sort by timestamp
+        const limitedUpdates = Object.values(updatesByUser)
+            .flat()
+            .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
         return NextResponse.json(limitedUpdates);
     } catch (error) {

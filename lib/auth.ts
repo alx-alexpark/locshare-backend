@@ -18,8 +18,6 @@ export async function getAuth(token: string): Promise<openpgp.Key | null> {
                 user: true
             }
         });
-        
-        console.log(attestation);
 
         if (!attestation?.user?.publicKey) {
             return null;
