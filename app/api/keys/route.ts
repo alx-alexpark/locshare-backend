@@ -53,7 +53,7 @@ export async function GET(request: Request) {
             publicKey: user.publicKey
         });
     } catch (error) {
-        console.error('Error fetching public key:', error);
+        console.trace('Error fetching public key:', error);
         return NextResponse.json(
             { error: 'Failed to fetch public key' },
             { status: 500 }

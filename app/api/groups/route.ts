@@ -32,8 +32,8 @@ export async function POST(request: Request) {
                 members: {
                     connect: [
                         { keyid: key.getKeyID().toHex().toUpperCase() }, // Creator
-                        ...(memberKeyIds || []).map((keyId: string) => ({ keyid: keyId }))
-                    ]
+                        ...(memberKeyIds.filter(k => !!k) || []).map((keyId: string) => ({ keyid: keyId }))
+                    ].filter(c => !!c)
                 }
             },
             include: {
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
 
         return NextResponse.json(group);
     } catch (error) {
-        console.error('Error creating group:', error);
+        console.trace('Error creating group:', error.stack);
         return NextResponse.json(
             { error: 'Failed to create group' },
             { status: 500 }
@@ -91,7 +91,7 @@ export async function GET(request: Request) {
 
         return NextResponse.json(groups);
     } catch (error) {
-        console.error('Error fetching groups:', error);
+        console.trace('Error fetching groups:', error);
         return NextResponse.json(
             { error: 'Failed to fetch groups' },
             { status: 500 }
@@ -190,7 +190,7 @@ export async function PATCH(request: Request) {
 
         return NextResponse.json(updatedGroup);
     } catch (error) {
-        console.error('Error adding members to group:', error);
+        console.trace('Error adding members to group:', error);
         return NextResponse.json(
             { error: 'Failed to add members to group' },
             { status: 500 }

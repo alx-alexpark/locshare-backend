@@ -33,7 +33,7 @@ export async function getAuth(token: string): Promise<openpgp.Key | null> {
 
         return key;
     } catch (error) {
-        console.error('Error in getAuth:', error);
+        console.trace('Error in getAuth:', error);
         return null;
     }
 } 

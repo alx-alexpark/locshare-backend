@@ -4,7 +4,7 @@ import * as openpgp from 'openpgp';
 export async function POST(request: Request) {
     const data = await request.json();
     const { pubkey } = data;
-    let key: openpgp.Key = await openpgp.readKey({ armoredKey: pubkey });
+    const key: openpgp.Key = await openpgp.readKey({ armoredKey: pubkey });
 
     if (await key.isRevoked() || await key.isPrivate()) {
         return Response.json({ error: 'Invalid key' }, { status: 400 });
@@ -23,6 +23,7 @@ export async function POST(request: Request) {
             },
         }
     )
-    return Response.json({ sucess: true, keyId: keyId });
+
+    return Response.json({ success: true, keyId: keyId });
 
 }

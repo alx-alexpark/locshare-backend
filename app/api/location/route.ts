@@ -93,7 +93,7 @@ export async function POST(request: Request) {
 
         return NextResponse.json(locationUpdate);
     } catch (error) {
-        console.error('Error creating location update:', error);
+        console.trace('Error creating location update:', error);
         return NextResponse.json(
             { error: 'Failed to create location update' },
             { status: 500 }
@@ -221,7 +221,7 @@ export async function GET(request: Request) {
 
         return NextResponse.json(limitedUpdates);
     } catch (error) {
-        console.error('Error fetching location updates:', error);
+        console.trace('Error fetching location updates:', error);
         return NextResponse.json(
             { error: 'Failed to fetch location updates' },
             { status: 500 }
